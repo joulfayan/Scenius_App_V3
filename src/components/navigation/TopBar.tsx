@@ -20,12 +20,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { OnlineMembers } from '@/components/presence/OnlineMembers';
+import { usePresence } from '@/hooks/usePresence';
 
 interface TopBarProps {
   isSidebarOpen: boolean;
   onToggleSidebar: () => void;
   currentPhase?: string;
   onQuickAction: (action: string) => void;
+  projectId?: string | null;
 }
 
 const QUICK_ACTIONS = [
@@ -63,8 +66,10 @@ export default function TopBar({
   isSidebarOpen, 
   onToggleSidebar, 
   currentPhase,
-  onQuickAction 
+  onQuickAction,
+  projectId
 }: TopBarProps) {
+  const { onlineUsers, currentUser } = usePresence(projectId);
   const handleQuickAction = (actionId: string) => {
     onQuickAction(actionId);
     // Here you would implement the actual action logic
@@ -132,6 +137,12 @@ export default function TopBar({
 
         {/* Right Section */}
         <div className="flex items-center gap-2">
+          {/* Online Members */}
+          <OnlineMembers 
+            onlineUsers={onlineUsers}
+            currentUserId={currentUser?.uid}
+          />
+
           {/* Quick Actions Dropdown for smaller screens */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

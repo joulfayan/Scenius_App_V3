@@ -4,10 +4,9 @@ import { announce } from './a11y';
 /**
  * A debounced save function for optimistic UI updates.
  * In a real Firebase app, this would interact with Firestore.
- * Here, we simulate it with the Base44 Entity SDK.
  * 
  * @param {object} params
- * @param {any} params.Entity - The Base44 Entity class (e.g., Shot, StoryboardFrame).
+ * @param {any} params.Entity - The Entity class (e.g., Shot, StoryboardFrame).
  * @param {string} params.docId - The ID of the document/entity to update.
  * @param {object} params.payload - The data to update.
  * @param {function} params.onSuccess - Callback on successful save.

@@ -1,0 +1,20 @@
+{
+  "testProject": {
+    "title": "Test Detective Story",
+    "description": "A test project for automated testing",
+    "genre": "drama",
+    "format": "short",
+    "logline": "A detective investigates a mysterious case",
+    "budget_range": "micro"
+  },
+  "testScript": {
+    "content": "FADE IN:\n\nINT. POLICE STATION - DAY\n\nDetective JOHN (30s) sits at his cluttered desk, examining his badge. The office buzzes with activity.\n\nJOHN\n(quietly)\nAnother day, another case.\n\nHe takes a sip of coffee and opens a file folder.\n\nFADE OUT.",
+    "version": 1,
+    "durationMins": 2
+  },
+  "testUser": {
+    "uid": "test-user-123",
+    "email": "test@example.com",
+    "displayName": "Test User"
+  }
+}

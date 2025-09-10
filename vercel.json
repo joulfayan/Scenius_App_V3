@@ -1,0 +1,14 @@
+{
+  "functions": {
+    "api/ai.ts": {
+      "runtime": "nodejs18.x"
+    }
+  },
+  "env": {
+    "PROVIDER": "openai",
+    "MODEL": "gpt-4o-mini"
+  },
+  "devCommand": "npm run dev",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist"
+}

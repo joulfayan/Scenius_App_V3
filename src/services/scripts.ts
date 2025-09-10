@@ -38,6 +38,26 @@ export interface SaveScriptVersionData {
 }
 
 /**
+ * Gets a single script by ID
+ * @param projectId - The project ID
+ * @param scriptId - The script ID to fetch
+ * @returns Promise with the script data or null if not found
+ */
+export async function getScript(projectId: string, scriptId: string): Promise<Script | null> {
+  const scriptDoc = doc(db, 'projects', projectId, 'scripts', scriptId);
+  const docSnap = await getDoc(scriptDoc);
+  
+  if (docSnap.exists()) {
+    return {
+      id: docSnap.id,
+      ...docSnap.data()
+    } as Script;
+  }
+  
+  return null;
+}
+
+/**
  * Saves or updates a script in Firestore
  * @param projectId - The project ID
  * @param scriptId - The script ID

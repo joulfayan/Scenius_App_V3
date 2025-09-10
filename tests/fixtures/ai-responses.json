@@ -1,0 +1,158 @@
+{
+  "breakdownScene1": {
+    "elements": [
+      {
+        "type": "character",
+        "name": "JOHN",
+        "description": "Main character, 30s, detective",
+        "notes": "Lead role",
+        "priority": "high",
+        "estimatedCost": 0
+      },
+      {
+        "type": "character",
+        "name": "SARAH",
+        "description": "Supporting character, 20s, witness",
+        "notes": "Supporting role",
+        "priority": "medium",
+        "estimatedCost": 0
+      },
+      {
+        "type": "prop",
+        "name": "Detective Badge",
+        "description": "Police detective badge",
+        "notes": "Essential prop for character",
+        "priority": "high",
+        "estimatedCost": 25
+      },
+      {
+        "type": "prop",
+        "name": "Coffee Cup",
+        "description": "Styrofoam coffee cup",
+        "notes": "Background prop",
+        "priority": "low",
+        "estimatedCost": 2
+      },
+      {
+        "type": "location",
+        "name": "Police Station",
+        "description": "Interior police station office",
+        "notes": "Main location",
+        "priority": "high",
+        "estimatedCost": 500
+      }
+    ],
+    "locations": [
+      {
+        "name": "Police Station",
+        "type": "interior",
+        "description": "Modern police station office with desk and filing cabinets",
+        "requirements": ["Desk", "Chairs", "Filing cabinets", "Police equipment"],
+        "estimatedCost": 500
+      }
+    ],
+    "characters": [
+      {
+        "name": "JOHN",
+        "description": "Detective, 30s, professional attire",
+        "costume": ["Suit", "Tie", "Detective badge"],
+        "props": ["Detective badge", "Notebook", "Pen"],
+        "specialRequirements": "None"
+      },
+      {
+        "name": "SARAH",
+        "description": "Witness, 20s, casual attire",
+        "costume": ["Casual shirt", "Jeans"],
+        "props": ["Coffee cup"],
+        "specialRequirements": "None"
+      }
+    ],
+    "technical": {
+      "lighting": ["Overhead fluorescent lights", "Desk lamp"],
+      "sound": ["Background office noise", "Phone ringing"],
+      "camera": ["Standard lens", "Tripod"],
+      "specialEffects": []
+    },
+    "summary": {
+      "totalElements": 5,
+      "estimatedBudget": 527,
+      "complexity": "low",
+      "specialRequirements": []
+    }
+  },
+  "shotlistScene1": {
+    "shots": [
+      {
+        "shotNumber": "1A",
+        "shotType": "WIDE",
+        "angle": "EYE_LEVEL",
+        "movement": "STATIC",
+        "description": "Wide shot of police station office, establishing location",
+        "duration": 5,
+        "characters": ["JOHN"],
+        "props": ["Desk", "Filing cabinets"],
+        "location": "Police Station",
+        "lighting": "Overhead fluorescent lighting",
+        "camera": {
+          "lens": "24-70mm",
+          "settings": "f/4, 1/60s, ISO 800",
+          "filters": []
+        },
+        "notes": "Establishing shot",
+        "difficulty": "easy",
+        "estimatedTime": 15
+      },
+      {
+        "shotNumber": "1B",
+        "shotType": "MEDIUM",
+        "angle": "EYE_LEVEL",
+        "movement": "STATIC",
+        "description": "Medium shot of John at his desk, looking at files",
+        "duration": 8,
+        "characters": ["JOHN"],
+        "props": ["Detective badge", "Files", "Coffee cup"],
+        "location": "Police Station",
+        "lighting": "Desk lamp + overhead",
+        "camera": {
+          "lens": "50mm",
+          "settings": "f/2.8, 1/60s, ISO 400",
+          "filters": []
+        },
+        "notes": "Character introduction",
+        "difficulty": "easy",
+        "estimatedTime": 20
+      },
+      {
+        "shotNumber": "1C",
+        "shotType": "CLOSE",
+        "angle": "EYE_LEVEL",
+        "movement": "STATIC",
+        "description": "Close-up of John's hands examining detective badge",
+        "duration": 3,
+        "characters": ["JOHN"],
+        "props": ["Detective badge"],
+        "location": "Police Station",
+        "lighting": "Desk lamp",
+        "camera": {
+          "lens": "85mm",
+          "settings": "f/2.8, 1/60s, ISO 400",
+          "filters": []
+        },
+        "notes": "Detail shot",
+        "difficulty": "easy",
+        "estimatedTime": 10
+      }
+    ],
+    "coverage": {
+      "totalShots": 3,
+      "estimatedDuration": 16,
+      "complexity": "low",
+      "specialEquipment": []
+    },
+    "schedule": {
+      "estimatedDays": 1,
+      "dailyShots": [3],
+      "priority": ["must_have", "must_have", "should_have"]
+    }
+  }
+}

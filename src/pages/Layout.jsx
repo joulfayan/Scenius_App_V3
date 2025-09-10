@@ -9,6 +9,7 @@ import { Project } from "@/api/entities";
 import NavigationSidebar from "@/components/navigation/NavigationSidebar";
 import TopBar from "@/components/navigation/TopBar";
 import { usePhaseNavigation } from "@/hooks/usePhaseNavigation";
+import { useCursorTracking } from "@/hooks/useCursorTracking";
 
 // Old navigation config removed - now using NavigationSidebar component
 
@@ -22,6 +23,9 @@ export default function Layout({ children, currentPageName }) {
   
   // Use the new phase navigation hook
   const { currentPhase, setPhase, setPhaseAndView } = usePhaseNavigation();
+  
+  // Enable cursor tracking for presence
+  const { isTracking } = useCursorTracking(projectId, true);
 
   useEffect(() => {
     const isMobile = window.innerWidth < 768;
@@ -91,6 +95,7 @@ export default function Layout({ children, currentPageName }) {
           onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
           currentPhase={currentPhase}
           onQuickAction={handleQuickAction}
+          projectId={projectId}
         />
 
         {/* Page Content */}

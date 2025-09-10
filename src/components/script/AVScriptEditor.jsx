@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { AVScript, AVSegment, AVRow } from '@/api/entities';
-import { UploadFile } from '@/api/integrations';
+import { uploadFile, generateFilePath, validateFile } from '@/lib/storage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -53,7 +53,7 @@ const AutoResizingTextarea = ({ value, onChange, placeholder, className }) => {
   );
 };
 
-const AVScriptRow = ({ row, segmentOrder, onUpdate, onDelete, onImageUpload }) => {
+const AVScriptRow = ({ row, segmentOrder, onUpdate, onDelete, onImageUpload, projectId }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [debouncedRow] = useDebounce(row, 1000);
 
@@ -69,8 +69,20 @@ const AVScriptRow = ({ row, segmentOrder, onUpdate, onDelete, onImageUpload }) =
     if (!file) return;
     setIsUploading(true);
     try {
-      const { file_url } = await UploadFile({ file });
-      onImageUpload(file_url);
+      // Validate file before upload
+      const validation = validateFile(file, { 
+        maxSize: 10 * 1024 * 1024, // 10MB
+        allowedTypes: ['image/*'] 
+      });
+      
+      if (!validation.valid) {
+        console.error("File validation failed:", validation.error);
+        return;
+      }
+
+      const filePath = generateFilePath(projectId, file.name, 'av-script');
+      const { url } = await uploadFile(projectId, filePath, file);
+      onImageUpload(url);
     } catch (error) {
       console.error("Image upload failed:", error);
     } finally {
@@ -131,7 +143,7 @@ const AVScriptRow = ({ row, segmentOrder, onUpdate, onDelete, onImageUpload }) =
   );
 };
 
-const AVScriptSegment = ({ segment, rows, onUpdate, onRowChange, onRowCreate, onRowDelete, onSegmentDelete }) => {
+const AVScriptSegment = ({ segment, rows, onUpdate, onRowChange, onRowCreate, onRowDelete, onSegmentDelete, projectId }) => {
   const [debouncedSegment] = useDebounce(segment, 1000);
 
   useEffect(() => {
@@ -179,6 +191,7 @@ const AVScriptSegment = ({ segment, rows, onUpdate, onRowChange, onRowCreate, on
                 onUpdate={(updatedRow, immediate) => onRowChange(updatedRow, immediate)}
                 onDelete={() => onRowDelete(row.id)}
                 onImageUpload={(imageUrl) => onRowChange({ ...row, image_url: imageUrl }, true)}
+                projectId={projectId}
               />
             ))}
           </div>
@@ -402,6 +415,7 @@ export default function AVScriptEditor({ projectId }) {
                 onRowCreate={() => handleAddRow(segment.id)}
                 onRowDelete={handleDeleteRow}
                 onSegmentDelete={() => handleDeleteSegment(segment.id)}
+                projectId={projectId}
               />
             ))}
 

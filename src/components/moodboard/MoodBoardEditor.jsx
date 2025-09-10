@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { MoodBoard, MoodBoardAsset, MoodBoardItem } from '@/api/entities';
-import { UploadFile } from '@/api/integrations';
+import { uploadFile, deleteFile, generateFilePath, validateFile } from '@/lib/storage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -145,13 +145,26 @@ export default function MoodBoardEditor({ projectId }) {
       const file = e.dataTransfer.files[0];
       if (file.type.startsWith('image/')) {
         try {
-          const { file_url } = await UploadFile({ file });
+          // Validate file before upload
+          const validation = validateFile(file, { 
+            maxSize: 10 * 1024 * 1024, // 10MB
+            allowedTypes: ['image/*'] 
+          });
+          
+          if (!validation.valid) {
+            toast.error(validation.error);
+            return;
+          }
+
+          const filePath = generateFilePath(projectId, file.name, 'moodboard');
+          const { url } = await uploadFile(projectId, filePath, file);
+          
           await createItem({
             type: 'image',
             x, y,
             width: 200,
             height: 150,
-            content: file_url,
+            content: url,
             styles: { caption: file.name }
           });
           toast.success("Image added to mood board.");
@@ -625,12 +638,25 @@ export default function MoodBoardEditor({ projectId }) {
               const file = e.target.files[0];
               if (file) {
                 try {
-                  const { file_url } = await UploadFile({ file });
+                  // Validate file before upload
+                  const validation = validateFile(file, { 
+                    maxSize: 10 * 1024 * 1024, // 10MB
+                    allowedTypes: ['image/*'] 
+                  });
+                  
+                  if (!validation.valid) {
+                    toast.error(validation.error);
+                    return;
+                  }
+
+                  const filePath = generateFilePath(projectId, file.name, 'moodboard-assets');
+                  const { url } = await uploadFile(projectId, filePath, file);
+                  
                   const newAsset = await MoodBoardAsset.create({
                     project_id: projectId,
                     name: file.name,
-                    url: file_url,
-                    thumbnail_url: file_url
+                    url: url,
+                    thumbnail_url: url
                   });
                   setAssets(prev => [newAsset, ...prev]);
                   toast.success("Asset uploaded successfully.");

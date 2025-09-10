@@ -4,7 +4,12 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "types": ["vite/client"],
+    "module": "esnext",
+    "target": "esnext",
+    "lib": ["es2020", "dom", "dom.iterable"],
+    "moduleResolution": "node"
   },
-  "include": ["src/**/*.js", "src/**/*.jsx"]
+  "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx", "src/vite-env.d.ts"]
 } 

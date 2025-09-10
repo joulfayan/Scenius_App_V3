@@ -1,0 +1,269 @@
+{
+  "aiCallsheetResponse": {
+    "production": {
+      "title": "Test Callsheet Project",
+      "date": "2024-01-15",
+      "day": 1,
+      "weather": "Sunny",
+      "sunrise": "6:30 AM",
+      "sunset": "7:30 PM"
+    },
+    "schedule": {
+      "callTime": "7:00 AM",
+      "wrapTime": "7:00 PM",
+      "lunchTime": "12:00 PM",
+      "totalHours": 12
+    },
+    "locations": [
+      {
+        "name": "Main Street Studio",
+        "address": "123 Main Street, Los Angeles, CA 90210",
+        "contact": "Studio Manager",
+        "callTime": "7:00 AM",
+        "wrapTime": "7:00 PM",
+        "notes": "Indoor studio space with full facilities"
+      }
+    ],
+    "cast": [
+      {
+        "name": "Actor One",
+        "character": "Protagonist",
+        "callTime": "8:00 AM",
+        "costume": "Business attire",
+        "makeup": "Natural look",
+        "notes": "Lead actor for scenes 1-3"
+      },
+      {
+        "name": "Actor Two",
+        "character": "Supporting",
+        "callTime": "9:00 AM",
+        "costume": "Casual wear",
+        "makeup": "Light makeup",
+        "notes": "Supporting role for scene 2"
+      }
+    ],
+    "crew": [
+      {
+        "name": "John Director",
+        "position": "Director",
+        "callTime": "7:00 AM",
+        "contact": "555-0101",
+        "notes": "Lead director"
+      },
+      {
+        "name": "Jane Producer",
+        "position": "Producer",
+        "callTime": "7:00 AM",
+        "contact": "555-0102",
+        "notes": "Executive producer"
+      },
+      {
+        "name": "Bob DP",
+        "position": "Director of Photography",
+        "callTime": "7:00 AM",
+        "contact": "555-0103",
+        "notes": "Camera department head"
+      },
+      {
+        "name": "Alice Sound",
+        "position": "Sound Mixer",
+        "callTime": "7:30 AM",
+        "contact": "555-0104",
+        "notes": "Audio department"
+      },
+      {
+        "name": "Charlie Grip",
+        "position": "Key Grip",
+        "callTime": "7:00 AM",
+        "contact": "555-0105",
+        "notes": "Grip department head"
+      }
+    ],
+    "equipment": {
+      "camera": [
+        "ARRI Alexa Mini LF",
+        "Canon C70",
+        "Sony FX9",
+        "Various lenses (24-70mm, 85mm, 135mm)"
+      ],
+      "lighting": [
+        "ARRI SkyPanel S60-C",
+        "Kino Flo Diva-Lite 400",
+        "Aputure 300D",
+        "Various modifiers and flags"
+      ],
+      "sound": [
+        "Sound Devices MixPre-6",
+        "Sennheiser MKE 600",
+        "Lavalier microphones",
+        "Boom pole and accessories"
+      ],
+      "grip": [
+        "C-stands",
+        "Sandbags",
+        "Apple boxes",
+        "Flags and silks"
+      ],
+      "special": [
+        "Gimbal stabilizer",
+        "Slider dolly",
+        "Green screen backdrop"
+      ]
+    },
+    "transportation": [
+      {
+        "type": "15-passenger van",
+        "capacity": 15,
+        "driver": "Mike Driver",
+        "contact": "555-0200",
+        "notes": "Crew transportation"
+      },
+      {
+        "type": "Equipment truck",
+        "capacity": 2,
+        "driver": "Sarah Equipment",
+        "contact": "555-0201",
+        "notes": "Camera and lighting equipment"
+      }
+    ],
+    "meals": {
+      "breakfast": "7:00 AM - Continental breakfast provided",
+      "lunch": "12:00 PM - Catered lunch from local restaurant",
+      "dinner": "6:00 PM - Wrap dinner for extended days",
+      "craftServices": "Coffee, snacks, and beverages available throughout the day"
+    },
+    "safety": {
+      "hazards": [
+        "Electrical equipment",
+        "Heavy camera gear",
+        "Wet floors in studio"
+      ],
+      "precautions": [
+        "All crew must wear closed-toe shoes",
+        "Electrical safety briefing required",
+        "First aid kit available on set"
+      ],
+      "emergencyContacts": [
+        {
+          "name": "Studio Manager",
+          "position": "Location Contact",
+          "phone": "555-0200"
+        },
+        {
+          "name": "Production Office",
+          "position": "Office Manager",
+          "phone": "555-0300"
+        }
+      ]
+    },
+    "hospitals": [
+      {
+        "name": "City General Hospital",
+        "address": "456 Medical Center Dr, Los Angeles, CA 90210",
+        "phone": "555-1000",
+        "distance": "2.3 miles"
+      },
+      {
+        "name": "Emergency Care Center",
+        "address": "789 Health St, Los Angeles, CA 90210",
+        "phone": "555-1001",
+        "distance": "1.8 miles"
+      }
+    ],
+    "notes": [
+      "Parking available in rear lot",
+      "Security code for entrance: 1234",
+      "WiFi password: Studio2024",
+      "No smoking on premises",
+      "Quiet hours after 10 PM"
+    ]
+  },
+  "testStripDay": {
+    "id": "day-1",
+    "date": "2024-01-15",
+    "sceneOrder": ["scene-1", "scene-2", "scene-3"],
+    "targetMins": 480,
+    "totalMins": 450,
+    "notes": "First day of shooting - interior scenes"
+  },
+  "testContacts": [
+    {
+      "id": "contact-1",
+      "name": "John Director",
+      "email": "john@example.com",
+      "phone": "555-0101",
+      "role": "Director",
+      "company": "Production Co"
+    },
+    {
+      "id": "contact-2",
+      "name": "Jane Producer",
+      "email": "jane@example.com",
+      "phone": "555-0102",
+      "role": "Producer",
+      "company": "Production Co"
+    },
+    {
+      "id": "contact-3",
+      "name": "Bob DP",
+      "email": "bob@example.com",
+      "phone": "555-0103",
+      "role": "DP",
+      "company": "Camera Dept"
+    },
+    {
+      "id": "contact-4",
+      "name": "Alice Sound",
+      "email": "alice@example.com",
+      "phone": "555-0104",
+      "role": "Sound",
+      "company": "Audio Dept"
+    },
+    {
+      "id": "contact-5",
+      "name": "Charlie Grip",
+      "email": "charlie@example.com",
+      "phone": "555-0105",
+      "role": "Grip",
+      "company": "Grip Dept"
+    }
+  ],
+  "testLocation": {
+    "id": "location-1",
+    "name": "Main Street Studio",
+    "address": "123 Main Street, Los Angeles, CA 90210",
+    "description": "Indoor studio space with full facilities",
+    "coordinates": {
+      "lat": 34.0522,
+      "lng": -118.2437
+    },
+    "contactInfo": {
+      "name": "Studio Manager",
+      "phone": "555-0200",
+      "email": "studio@example.com"
+    }
+  },
+  "expectedCallsheetData": {
+    "date": "2024-01-15",
+    "unitName": "Unit 1 - 2024-01-15",
+    "dayId": "day-1",
+    "locationId": "location-1",
+    "recipients": ["contact-1", "contact-2", "contact-3", "contact-4", "contact-5"],
+    "weather": {
+      "high": 75,
+      "low": 60,
+      "condition": "Sunny",
+      "sunrise": "6:30 AM",
+      "sunset": "7:30 PM"
+    },
+    "hospitals": [
+      {
+        "name": "City General Hospital",
+        "address": "456 Medical Center Dr, Los Angeles, CA 90210",
+        "phone": "555-1000",
+        "distance": "2.3 miles"
+      }
+    ],
+    "notes": "Call Sheet for 2024-01-15\n\nLocation: Main Street Studio\nAddress: 123 Main Street, Los Angeles, CA 90210\nScenes: 3 scenes scheduled\nTarget Duration: 8h 0m\n\nNotes: First day of shooting - interior scenes"
+  }
+}

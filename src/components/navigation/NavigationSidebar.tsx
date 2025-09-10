@@ -12,7 +12,8 @@ import {
   Briefcase,
   Settings,
   PanelLeftClose,
-  PanelLeft
+  PanelLeft,
+  Bug
 } from 'lucide-react';
 import {
   Collapsible,
@@ -276,6 +277,16 @@ export default function NavigationSidebar({
             <Settings className="w-4 h-4" />
             Settings
           </Link>
+          {/* Temporary Diagnostic Link - Only available in non-production */}
+          {import.meta.env.NODE_ENV !== 'production' && (
+            <Link
+              to="/diag"
+              className="flex items-center gap-2 p-2 rounded-lg text-sm text-orange-600 hover:bg-orange-50 transition-colors"
+            >
+              <Bug className="w-4 h-4" />
+              Diagnostics
+            </Link>
+          )}
         </div>
       </aside>
     </>

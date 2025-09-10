@@ -1,0 +1,9 @@
+[build]
+  functions = "api"
+
+[functions."api/ai.ts"]
+  runtime = "nodejs18.x"
+
+[build.environment]
+  PROVIDER = "openai"
+  MODEL = "gpt-4o-mini"
