@@ -4,7 +4,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { 
   AlignLeft, Hash, MessageSquare, Download, FileText, 
-  Palette, Eye, EyeOff, MoreVertical 
+  Palette, Eye, EyeOff, MoreVertical, Clock, History,
+  BarChart3, Scissors, Image, Tag
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -28,7 +29,11 @@ export default function ScriptToolbar({
   pageMetrics,
   revisionMode,
   selectedRevisionColor,
-  onRevisionColorChange
+  onRevisionColorChange,
+  onToggleSidebar,
+  activeSidebar,
+  selectedText,
+  onTagText
 }) {
   return (
     <div className="border-b border-gray-200 px-6 py-3 bg-white flex items-center justify-between">
@@ -61,6 +66,37 @@ export default function ScriptToolbar({
         >
           <Palette className="w-4 h-4 mr-1" />
           Revisions
+        </Button>
+        
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onToggleSidebar(activeSidebar === 'duration' ? null : 'duration')}
+          className={activeSidebar === 'duration' ? 'bg-blue-50' : ''}
+        >
+          <Clock className="w-4 h-4 mr-1" />
+          Duration
+        </Button>
+        
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onToggleSidebar(activeSidebar === 'versions' ? null : 'versions')}
+          className={activeSidebar === 'versions' ? 'bg-blue-50' : ''}
+        >
+          <History className="w-4 h-4 mr-1" />
+          Versions
+        </Button>
+        
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onTagText(selectedText)}
+          disabled={!selectedText}
+          className={selectedText ? 'bg-green-50' : ''}
+        >
+          <Tag className="w-4 h-4 mr-1" />
+          Tag
         </Button>
         
         {revisionMode && (

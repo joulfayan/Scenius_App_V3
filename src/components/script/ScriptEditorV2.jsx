@@ -31,7 +31,12 @@ import ScriptSidebar from "./ScriptSidebar";
 import TitlePageEditor from "./TitlePageEditor";
 import ScriptSettings from "./ScriptSettings";
 import MultiColumnAVEditor from "./MultiColumnAVEditor";
+import DurationTracker from "./DurationTracker";
+import VersionHistory from "./VersionHistory";
+import TaggingDialog from "./TaggingDialog";
 import { ELEMENT_TYPES, parseLine, formatLine, getNextElementType, cycleElementType } from "./ScriptFormatter";
+import { useScriptVersions } from "@/hooks/useScriptVersions";
+import { useProductionElements } from "@/hooks/useProductionElements";
 
 // Feature flags for progressive rollout
 const SCRIPT_FEATURES = {
@@ -133,6 +138,26 @@ export default function ScriptEditorV2({ initialContent, onSave, projectId }) {
     return initialContent || createEmptyScript();
   });
 
+  // Version management
+  const {
+    versions,
+    currentVersion,
+    isLoading: versionsLoading,
+    createVersion,
+    restoreVersion,
+    deleteVersion,
+    downloadVersion,
+    autoSave
+  } = useScriptVersions(projectId);
+
+  // Production elements management
+  const {
+    elements,
+    createElement,
+    linkElementToScene,
+    getElementsByScene
+  } = useProductionElements(projectId);
+
   // UI state
   const [saveStatus, setSaveStatus] = useState("idle");
   const [activeLineId, setActiveLineId] = useState(null);
@@ -144,6 +169,9 @@ export default function ScriptEditorV2({ initialContent, onSave, projectId }) {
   const [showTitlePageEditor, setShowTitlePageEditor] = useState(false);
   const [showScriptSettings, setShowScriptSettings] = useState(false);
   const [showFindReplace, setShowFindReplace] = useState(false);
+  const [showTaggingDialog, setShowTaggingDialog] = useState(false);
+  const [taggingText, setTaggingText] = useState('');
+  const [currentSceneId, setCurrentSceneId] = useState(null);
 
   // Sidebar states
   const [activeSidebar, setActiveSidebar] = useState(null); // 'comments', 'media', 'breakdown', 'insights', 'outline'
@@ -185,7 +213,7 @@ export default function ScriptEditorV2({ initialContent, onSave, projectId }) {
     };
   }, []);
 
-  // Calculate metrics
+  // Calculate metrics including duration
   const metrics = useMemo(() => {
     const lines = scriptDoc.lines;
     const text = lines.map(l => l.text).join(' ');
@@ -196,8 +224,42 @@ export default function ScriptEditorV2({ initialContent, onSave, projectId }) {
     // Estimate pages (55 lines per page for film/TV)
     const pageCount = Math.max(1, Math.ceil(lines.length / 55));
 
-    // Estimate runtime (1 page ≈ 1 minute for film/TV)
-    const estimatedRuntime = currentMode === SCRIPT_MODES.FILM_TV ? pageCount :
+    // Calculate scene durations
+    const sceneDurations = [];
+    let currentSceneLines = [];
+    
+    lines.forEach((line) => {
+      if (line.type === ELEMENT_TYPES.SCENE) {
+        if (currentSceneLines.length > 0) {
+          const sceneText = currentSceneLines.map(l => l.text).join(' ');
+          const sceneWords = sceneText.split(/\s+/).filter(w => w.length > 0);
+          const wordsPerMinute = currentMode === SCRIPT_MODES.FILM_TV ? 150 :
+                                currentMode === SCRIPT_MODES.STAGEPLAY ? 120 : 180;
+          const duration = Math.max(0.5, Math.min(10, sceneWords.length / wordsPerMinute));
+          sceneDurations.push(duration);
+        }
+        currentSceneLines = [line];
+      } else {
+        currentSceneLines.push(line);
+      }
+    });
+    
+    // Add last scene
+    if (currentSceneLines.length > 0) {
+      const sceneText = currentSceneLines.map(l => l.text).join(' ');
+      const sceneWords = sceneText.split(/\s+/).filter(w => w.length > 0);
+      const wordsPerMinute = currentMode === SCRIPT_MODES.FILM_TV ? 150 :
+                            currentMode === SCRIPT_MODES.STAGEPLAY ? 120 : 180;
+      const duration = Math.max(0.5, Math.min(10, sceneWords.length / wordsPerMinute));
+      sceneDurations.push(duration);
+    }
+
+    // Calculate total duration
+    const totalDuration = sceneDurations.reduce((sum, duration) => sum + duration, 0);
+
+    // Estimate runtime (fallback to page-based calculation)
+    const estimatedRuntime = totalDuration > 0 ? totalDuration :
+                            currentMode === SCRIPT_MODES.FILM_TV ? pageCount :
                             currentMode === SCRIPT_MODES.STAGEPLAY ? Math.ceil(pageCount * 1.5) :
                             Math.ceil(words.length / 250); // AV scripts
 
@@ -206,7 +268,9 @@ export default function ScriptEditorV2({ initialContent, onSave, projectId }) {
       characterCount: characters.length,
       pageCount,
       sceneCount: scenes.length,
-      estimatedRuntime
+      estimatedRuntime,
+      totalDuration,
+      sceneDurations
     };
   }, [scriptDoc.lines, currentMode]);
 
@@ -234,28 +298,16 @@ export default function ScriptEditorV2({ initialContent, onSave, projectId }) {
 
     if (success) {
       setSaveStatus("saved");
-      // Save revision if enabled
-      if (projectId && SCRIPT_FEATURES.filmTV) {
-        try {
-          const existingRevisions = await ScriptRevision.filter({ project_id: projectId }, '-created_date');
-          const newRevisionNumber = `v${existingRevisions.length + 1}`;
-          await ScriptRevision.create({
-            project_id: projectId,
-            revision_number: newRevisionNumber,
-            content: JSON.stringify(scriptDoc), // Save full document structure
-            notes: `Auto-saved on ${new Date().toLocaleString()}`,
-            is_current: true
-          });
-        } catch (error) {
-          console.error('Error saving revision:', error);
-        }
+      // Create version if project ID exists
+      if (projectId) {
+        await createVersion(scriptDoc, 'Manual save');
       }
       setTimeout(() => setSaveStatus("idle"), 2000);
     } else {
       setSaveStatus("error");
       setTimeout(() => setSaveStatus("idle"), 2000);
     }
-  }, [convertToLegacyFormat, onSave, projectId, scriptDoc]);
+  }, [convertToLegacyFormat, onSave, projectId, scriptDoc, createVersion]);
 
   // Debounced auto-save
   useEffect(() => {
@@ -265,7 +317,12 @@ export default function ScriptEditorV2({ initialContent, onSave, projectId }) {
 
     autoSaveTimeoutRef.current = setTimeout(() => {
       if (saveStatus === "idle") {
-        handleSave();
+        // Use auto-save for version management
+        if (projectId) {
+          autoSave(scriptDoc);
+        } else {
+          handleSave();
+        }
       }
     }, 2000);
 
@@ -274,7 +331,7 @@ export default function ScriptEditorV2({ initialContent, onSave, projectId }) {
         clearTimeout(autoSaveTimeoutRef.current);
       }
     };
-  }, [scriptDoc, handleSave, saveStatus]);
+  }, [scriptDoc, handleSave, saveStatus, projectId, autoSave]);
 
   // Line management functions
   const updateLine = useCallback((lineId, updates) => {
@@ -610,15 +667,41 @@ export default function ScriptEditorV2({ initialContent, onSave, projectId }) {
     }
   }, [scriptDoc.lines, addLine, updateLine, deleteLine, handleSave, toggleDualDialogue, applyFormatting]);
 
-  // Handle text selection for formatting
+  // Handle text selection for formatting and tagging
   const handleTextSelection = useCallback(() => {
     const selection = window.getSelection();
     if (selection && selection.toString().trim().length > 0) {
-      setSelectedText(selection.toString().trim());
+      const selectedText = selection.toString().trim();
+      setSelectedText(selectedText);
+      
+      // Check if user wants to tag (Ctrl+T or right-click)
+      // This will be handled by the toolbar or context menu
     } else {
       setSelectedText('');
     }
   }, []);
+
+  // Handle tagging
+  const handleTagText = useCallback((text) => {
+    setTaggingText(text);
+    setShowTaggingDialog(true);
+  }, []);
+
+  // Handle element creation from tagging
+  const handleElementCreated = useCallback((element) => {
+    // Find current scene ID based on active line
+    const activeLine = scriptDoc.lines.find(line => line.id === activeLineId);
+    if (activeLine && activeLine.type === 'scene') {
+      // Create a scene ID based on line content or use a generated one
+      const sceneId = `scene_${activeLine.id}`;
+      setCurrentSceneId(sceneId);
+      
+      // Link element to scene
+      if (element.linked_scenes && !element.linked_scenes.includes(sceneId)) {
+        linkElementToScene(element.id, sceneId);
+      }
+    }
+  }, [activeLineId, scriptDoc.lines, linkElementToScene]);
 
   // Mode-specific rendering
   const renderEditor = () => {
@@ -691,6 +774,7 @@ export default function ScriptEditorV2({ initialContent, onSave, projectId }) {
           onApplyFormat={applyFormatting}
           onToggleSidebar={setActiveSidebar}
           activeSidebar={activeSidebar}
+          onTagText={handleTagText}
         />
 
         {/* Editor Content */}
@@ -710,7 +794,10 @@ export default function ScriptEditorV2({ initialContent, onSave, projectId }) {
             <span>Page {metrics.pageCount}</span>
             <span>{metrics.wordCount} words</span>
             <span>{metrics.sceneCount} scenes</span>
-            <span>~{metrics.estimatedRuntime} min</span>
+            <span className="flex items-center gap-1">
+              <Clock className="w-3 h-3" />
+              ~{Math.round(metrics.totalDuration * 10) / 10} min
+            </span>
             {SCRIPT_FEATURES.collaboration && onlineUsers.length > 0 && (
               <div className="flex items-center space-x-1">
                 <Users className="w-4 h-4" />
@@ -739,6 +826,11 @@ export default function ScriptEditorV2({ initialContent, onSave, projectId }) {
           width={sidebarWidth}
           onWidthChange={setSidebarWidth}
           projectId={projectId}
+          versions={versions}
+          currentVersion={currentVersion}
+          onRestoreVersion={restoreVersion}
+          onDeleteVersion={deleteVersion}
+          onDownloadVersion={downloadVersion}
         />
       )}
 
@@ -821,6 +913,18 @@ export default function ScriptEditorV2({ initialContent, onSave, projectId }) {
             </div>
           </DialogContent>
         </Dialog>
+      )}
+
+      {/* Tagging Dialog */}
+      {showTaggingDialog && (
+        <TaggingDialog
+          isOpen={showTaggingDialog}
+          onClose={() => setShowTaggingDialog(false)}
+          selectedText={taggingText}
+          projectId={projectId}
+          sceneId={currentSceneId}
+          onElementCreated={handleElementCreated}
+        />
       )}
     </div>
   );

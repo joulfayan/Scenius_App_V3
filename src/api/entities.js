@@ -47,6 +47,10 @@ export const ProductionReport = base44.entities.ProductionReport;
 
 export const CatalogItem = base44.entities.CatalogItem;
 
+export const ProductionElement = base44.entities.ProductionElement;
+
+export const Actor = base44.entities.Actor;
+
 export const MoodBoard = base44.entities.MoodBoard;
 
 export const MoodBoardAsset = base44.entities.MoodBoardAsset;

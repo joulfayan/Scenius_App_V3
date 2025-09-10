@@ -10,6 +10,14 @@ import Settings from "./Settings";
 
 import ProjectSettings from "./ProjectSettings";
 
+// Five Phase Pages
+import StoryDevelopment from "./StoryDevelopment";
+import ScriptManagement from "./ScriptManagement";
+import PreProduction from "./PreProduction";
+import Production from "./Production";
+import Collaboration from "./Collaboration";
+import PhaseRouter from "@/components/navigation/PhaseRouter";
+
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 
 const PAGES = {
@@ -23,6 +31,13 @@ const PAGES = {
     Settings: Settings,
     
     ProjectSettings: ProjectSettings,
+    
+    // Five Phase Pages
+    StoryDevelopment: StoryDevelopment,
+    ScriptManagement: ScriptManagement,
+    PreProduction: PreProduction,
+    Production: Production,
+    Collaboration: Collaboration,
     
 }
 
@@ -60,6 +75,16 @@ function PagesContent() {
                 <Route path="/Settings" element={<Settings />} />
                 
                 <Route path="/ProjectSettings" element={<ProjectSettings />} />
+                
+                {/* Phase-based Routes */}
+                <Route path="/phase" element={<PhaseRouter />} />
+                
+                {/* Legacy Phase Routes (for backward compatibility) */}
+                <Route path="/StoryDevelopment" element={<StoryDevelopment />} />
+                <Route path="/ScriptManagement" element={<ScriptManagement />} />
+                <Route path="/PreProduction" element={<PreProduction />} />
+                <Route path="/Production" element={<Production />} />
+                <Route path="/Collaboration" element={<Collaboration />} />
                 
             </Routes>
         </Layout>
