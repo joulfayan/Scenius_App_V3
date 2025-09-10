@@ -1,5 +1,16 @@
 ---
-description:
-globs:
-alwaysApply: true
+description: Budget system rules (your differentiator)
+globs: ["src/modules/budget/**/*", "src/**/*Budget*.{ts,tsx,js,jsx}"]
+alwaysApply: false
 ---
+
+# Budget Everywhere
+- Represent all currency math with Decimal; never Number.
+- Support line items at scene/element/day/project scopes.
+- Provide roll-ups by department and by day.
+- Show day and project totals inside Stripboard & Gantt (cost-aware planning).
+- Warn when a day or department exceeds targets; surface soft caps visually.
+
+# Exports & History
+- Export budget as CSV and PDF with clear subtotals.
+- Maintain an event-sourced history of budget changes (who/what/when).

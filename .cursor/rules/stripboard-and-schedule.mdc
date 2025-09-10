@@ -1,5 +1,14 @@
 ---
-description:
-globs:
-alwaysApply: true
+description: Stripboard (digital strips) + Gantt
+globs: ["src/modules/breakdown/StripboardView.*", "src/modules/plan/GanttScheduler.*"]
+alwaysApply: false
 ---
+
+# Stripboard MVP
+- Drag/drop scenes into days; standard strip color conventions.
+- Show day total duration; warn if over target day length.
+- Respect filters (INT/EXT, DAY/NIGHT, location).
+
+# Gantt/Calendar
+- Visualize scheduled scenes/days with labels and simple dependencies.
+- Sync with Stripboard data (single source of truth).

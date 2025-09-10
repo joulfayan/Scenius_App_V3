@@ -1,5 +1,11 @@
 ---
-description:
-globs:
+description: Firestore schema & patterns for Scenius
+globs: ["src/**/*"]
 alwaysApply: true
 ---
+- Use Firebase Web v9 modular SDK (import from "firebase/*").
+- All project data lives under projects/{projectId}/...
+- Always write timestamps with serverTimestamp().
+- Link records using arrayUnion/arrayRemove for IDs.
+- Real-time UI uses onSnapshot() subscriptions.
+- Collections are created on first write; no pre-provisioning.

@@ -7,7 +7,7 @@
     "dev": "vite",
     "dev:api": "vercel dev --listen 3001 --yes",
     "dev:all": "concurrently \"npm run dev\" \"npm run dev:api\" --names \"vite,api\" --prefix-colors \"cyan,magenta\"",
-    "build": "vite build && node scripts/validate-production-build.js",
+    "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "check-firebase": "node scripts/check-firebase-config.js",

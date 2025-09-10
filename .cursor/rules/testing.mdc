@@ -1,5 +1,11 @@
 ---
-description:
-globs:
-alwaysApply: true
+description: Testing & dev hygiene
+globs: ["src/**/*.{ts,tsx,js,jsx}"]
+alwaysApply: false
 ---
+
+# Tests-First Workflow
+- For new modules/components: write unit tests (and simple integration tests) **first**.
+- Each PR: include minimal test coverage and a short file header doc.
+- Add lightweight logging for async flows (fetch, sync, export).
+- After implementing, propose follow-up tasks if gaps are found.

@@ -1,5 +1,14 @@
 ---
-description:
-globs:
-alwaysApply: true
+description: Breakdown tagging + Catalog manager
+globs: ["src/modules/breakdown/**/*", "src/modules/catalog/**/*"]
+alwaysApply: false
 ---
+
+# Tagging
+- In-script tagging writes element records and attaches to scenes.
+- Support bulk re-tagging and multi-select edits.
+
+# Catalog Manager
+- Inline-edit table: name, type, category, linked scenes, actor link, custom fields.
+- Character→actor linking is required.
+- Filters: by type, category, scene, actor; text search.

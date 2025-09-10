@@ -1,5 +1,20 @@
 ---
-description:
-globs:
-alwaysApply: true
+description: UI & Navigation rules (SB-style sidebar + quick actions top bar)
+globs: ["src/**/*.{tsx,jsx}"]
+alwaysApply: false
 ---
+
+# Navigation
+- Implement a left sidebar with phases: Write, Breakdown, Visualize, Plan, Shoot.
+- Add a top bar for quick actions (Import, Export, Run Breakdown, Generate Call Sheet).
+- Persist active phase via URL query (e.g., `?phase=breakdown`) to support deep linking.
+
+# Patterns
+- Use card/grid layouts for Storyboard and Mood Board with drag & drop.
+- Use inline-editable tables for Catalog, Contacts, and Scheduling lists.
+- Respect color coding for element categories.
+- Keyboard-first affordances in editors (script shortcuts, tagging hotkeys).
+
+# Accessibility & Responsiveness
+- Support keyboard navigation.
+- Mobile-friendly for on-set use (call sheets, contacts, locations).

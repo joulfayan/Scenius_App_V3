@@ -1,5 +1,12 @@
 ---
-description:
-globs:
-alwaysApply: true
+description: Script editor behavior (hybrid SB+Celtx)
+globs: ["src/modules/write/ScriptEditor.*", "src/modules/write/**/Script*.{tsx,jsx}"]
+alwaysApply: false
 ---
+
+# Script Editor Requirements
+- Provide screenplay formatting with keyboard shortcuts.
+- Show **live duration** (per scene and total) as the user types.
+- Support **version history** (v1, v2, …) with a simple diff view.
+- Embed **element tagging**: text selection → tag dialog → writes to Catalog.
+- Expose computed scene timings to Stripboard and Gantt.

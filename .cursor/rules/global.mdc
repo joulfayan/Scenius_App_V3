@@ -1,5 +1,18 @@
 ---
-description:
-globs:
+description: Global product principles for Scenius (SB×Celtx hybrid with Budget differentiator)
+globs: ["**/*"]
 alwaysApply: true
 ---
+
+# Scenius — Global Principles
+- Workflow-first: Phase-based navigation (Write → Breakdown → Visualize → Plan → Shoot).
+- Keep UI **dense** for data (catalog/schedule) and **spacious** for creative (storyboard/moodboard).
+- Auto-sync changes across modules (Script ⇄ Breakdown ⇄ Catalog ⇄ Stripboard ⇄ Call Sheet).
+- Zero manual duplication: updates in one module ripple through others.
+- Print/export quality is a feature (PDF/CSV).
+- Budget is a first-class citizen across modules (cost awareness in planning).
+
+# Deliverable Quality
+- Prefer small PR-sized changes.
+- Add minimal inline docs and tests with each feature.
+- Avoid breaking existing code; if you must refactor, stage it with tests.

@@ -1,5 +1,16 @@
 ---
-description:
-globs:
-alwaysApply: true
+description: Call sheet generator + Contacts + Locations
+globs: ["src/modules/shoot/**/*", "src/modules/plan/ContactDirectory.*", "src/modules/shoot/LocationManager.*"]
+alwaysApply: false
 ---
+
+# Call Sheets
+- Auto-populate from schedule (call times), contacts (roles/departments), and locations.
+- Include weather placeholders, map links, nearby hospitals.
+- Export to PDF/Email later.
+
+# Contacts
+- Directory with CSV import; departments & roles; availability notes.
+
+# Locations
+- Photos, notes, permits, map URL, parking info.

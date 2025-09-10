@@ -1,5 +1,21 @@
 ---
-description:
-globs:
-alwaysApply: true
+description: Data shapes for Script, Scene, Elements, Contacts, Budget
+globs: ["src/models/**/*.{ts,tsx,js,jsx}", "src/modules/**/*.{ts,tsx,js,jsx}"]
+alwaysApply: false
 ---
+
+# Entities
+- Script { id, version, content, durationMins, elements: ProductionElementID[], scenes: SceneID[], syncedModules: ModuleKey[] }
+- Scene { id, number, slug, heading, locationType: "INT"|"EXT", timeOfDay, contentRange, durationMins, elementIds: ProductionElementID[] }
+- ProductionElement { id, type, name, category, linkedScenes: SceneID[], linkedActorId?, customFields, estCost? } 
+  - element `type` follows SB-style 30+ taxonomy.
+  - `linkedActorId` enables Celtx-style character→actor mapping.
+- Actor { id, name, role?, contactId? }
+- Contact { id, name, department, role, phone?, email?, notes? }
+- Location { id, name, address?, mapUrl?, photos[], permits[], notes }
+- StripDay { id, date?, scenes: SceneID[], durationMinsTotal }
+- BudgetLineItem { id, scope: "scene"|"element"|"day"|"project", refId, description, qty, unitCost, total, currency }
+
+# Notes
+- All monetary values use Decimal (no float). Provide adapters/helpers.
+- Computed fields (e.g., day totals) live in selectors/hooks, not stored redundantly.

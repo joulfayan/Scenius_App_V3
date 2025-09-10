@@ -1,5 +1,14 @@
 ---
-description:
-globs:
-alwaysApply: true
+description: Exports (PDF/CSV) and reporting rules
+globs: ["src/services/exports/**/*", "src/services/reports/**/*", "src/modules/**/Export*.{ts,tsx,js,jsx}"]
+alwaysApply: false
 ---
+
+# Exports
+- Use Puppeteer to generate high-quality PDFs from HTML templates.
+- Templates: Script, Shot List, Stripboard, Call Sheet, Budget (with cover metadata).
+- Provide CSV exports for Catalog, Budget, Contacts.
+
+# Reports
+- Quick reports: Elements by Scene, Company Moves, Setups per Day, Overtime Risk, Budget by Department.
+- All reports must be reproducible and match export formatting.
