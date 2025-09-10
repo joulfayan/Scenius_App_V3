@@ -1,389 +1,254 @@
-// src/pages/diag.tsx
-import React, { useState, useEffect } from 'react';
-import { 
-  Card, 
-  CardContent, 
-  CardHeader, 
-  CardTitle 
-} from '../components/ui/card';
-import { 
-  Button 
-} from '../components/ui/button';
-import { 
-  Badge 
-} from '../components/ui/badge';
-import { 
-  Copy, 
-  RefreshCw, 
-  Eye, 
-  EyeOff,
-  CheckCircle,
-  AlertCircle,
-  Info
-} from 'lucide-react';
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Copy, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 
-interface EnvVar {
-  key: string;
-  value: string;
-  masked: boolean;
-}
+export default function DiagPage() {
+  // Get all VITE_ environment variables
+  const viteEnvVars = Object.keys(import.meta.env)
+    .filter(key => key.startsWith('VITE_'))
+    .sort()
+    .map(key => ({
+      key,
+      value: import.meta.env[key],
+      masked: maskValue(import.meta.env[key])
+    }));
 
-interface FirebaseConfig {
-  apiKey: string;
-  authDomain: string;
-  projectId: string;
-  storageBucket: string;
-  messagingSenderId: string;
-  appId: string;
-}
+  // Get server-side environment variables (these will be undefined in browser)
+  const serverEnvVars = [
+    { key: 'MODEL', value: import.meta.env.MODEL, masked: maskValue(import.meta.env.MODEL) },
+    { key: 'PROVIDER', value: import.meta.env.PROVIDER, masked: maskValue(import.meta.env.PROVIDER) }
+  ];
 
-const DiagnosticPage: React.FC = () => {
-  const [envVars, setEnvVars] = useState<EnvVar[]>([]);
-  const [firebaseConfig, setFirebaseConfig] = useState<FirebaseConfig | null>(null);
-  const [nodeEnv, setNodeEnv] = useState<string>('');
-  const [mode, setMode] = useState<string>('');
-  const [showValues, setShowValues] = useState<boolean>(false);
-  const [copied, setCopied] = useState<string | null>(null);
-
-  useEffect(() => {
-    // Get all VITE_* environment variables
-    const viteEnvVars: EnvVar[] = [];
-    for (const key in import.meta.env) {
-      if (key.startsWith('VITE_')) {
-        viteEnvVars.push({
-          key,
-          value: import.meta.env[key] || '',
-          masked: true
-        });
-      }
-    }
-    setEnvVars(viteEnvVars);
-
-    // Get NODE_ENV and MODE
-    setNodeEnv(import.meta.env.NODE_ENV || '');
-    setMode(import.meta.env.MODE || '');
-
-    // Get Firebase config
-    const config: FirebaseConfig = {
-      apiKey: import.meta.env.VITE_FIREBASE_API_KEY || '',
-      authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || '',
-      projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || '',
-      storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || '',
-      messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
-      appId: import.meta.env.VITE_FIREBASE_APP_ID || ''
-    };
-    setFirebaseConfig(config);
-  }, []);
-
-  const toggleValueVisibility = (index: number) => {
-    setEnvVars(prev => prev.map((env, i) => 
-      i === index ? { ...env, masked: !env.masked } : env
-    ));
+  // Get build information
+  const buildInfo = {
+    mode: import.meta.env.MODE,
+    dev: import.meta.env.DEV,
+    prod: import.meta.env.PROD,
+    base: import.meta.env.BASE_URL,
+    version: import.meta.env.VITE_APP_VERSION || 'Not set'
   };
 
-  const toggleAllValues = () => {
-    setShowValues(!showValues);
-    setEnvVars(prev => prev.map(env => ({ ...env, masked: showValues })));
+  // Get browser information
+  const browserInfo = {
+    userAgent: navigator.userAgent,
+    platform: navigator.platform,
+    language: navigator.language,
+    online: navigator.onLine,
+    cookieEnabled: navigator.cookieEnabled
   };
 
-  const maskValue = (value: string): string => {
-    if (!value) return '(empty)';
-    if (value.length <= 4) return '****';
-    return value.substring(0, 2) + '****' + value.substring(value.length - 2);
-  };
-
-  const copyToClipboard = async (text: string, type: string) => {
+  const copyToClipboard = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      setCopied(type);
-      setTimeout(() => setCopied(null), 2000);
+      // You could add a toast notification here
+      console.log('Copied to clipboard');
     } catch (err) {
-      console.error('Failed to copy to clipboard:', err);
+      console.error('Failed to copy: ', err);
     }
   };
 
-  const generateDiagnosticReport = () => {
-    const report = `# Scenius App Diagnostic Report
-Generated: ${new Date().toISOString()}
-
-## Environment Information
-- NODE_ENV: ${nodeEnv}
-- MODE: ${mode}
-
-## Vite Environment Variables
-${envVars.map(env => `${env.key}: ${env.masked ? maskValue(env.value) : env.value}`).join('\n')}
-
-## Firebase Configuration
-- API Key: ${firebaseConfig?.apiKey ? maskValue(firebaseConfig.apiKey) : 'Not set'}
-- Auth Domain: ${firebaseConfig?.authDomain || 'Not set'}
-- Project ID: ${firebaseConfig?.projectId || 'Not set'}
-- Storage Bucket: ${firebaseConfig?.storageBucket || 'Not set'}
-- Messaging Sender ID: ${firebaseConfig?.messagingSenderId || 'Not set'}
-- App ID: ${firebaseConfig?.appId || 'Not set'}
-
-## Browser Information
-- User Agent: ${navigator.userAgent}
-- Platform: ${navigator.platform}
-- Language: ${navigator.language}
-- Online: ${navigator.onLine}
-
-## URL Information
-- Current URL: ${window.location.href}
-- Origin: ${window.location.origin}
-- Pathname: ${window.location.pathname}
-`;
-
-    return report;
+  const generateReport = () => {
+    const report = {
+      timestamp: new Date().toISOString(),
+      build: buildInfo,
+      environment: {
+        vite: viteEnvVars,
+        server: serverEnvVars
+      },
+      browser: browserInfo,
+      runtime: {
+        build: 'Vite',
+        functions: 'nodejs20.x'
+      }
+    };
+    
+    return JSON.stringify(report, null, 2);
   };
 
-  const copyFullReport = () => {
-    const report = generateDiagnosticReport();
-    copyToClipboard(report, 'report');
+  const copyReport = () => {
+    copyToClipboard(generateReport());
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">System Diagnostics</h1>
-        <div className="flex gap-2">
-          <Button onClick={toggleAllValues} variant="outline">
-            {showValues ? <EyeOff className="h-4 w-4 mr-2" /> : <Eye className="h-4 w-4 mr-2" />}
-            {showValues ? 'Hide All Values' : 'Show All Values'}
-          </Button>
-          <Button onClick={copyFullReport}>
-            <Copy className="h-4 w-4 mr-2" />
-            Copy Full Report
-          </Button>
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-4xl mx-auto px-4">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Scenius App Diagnostic</h1>
+          <p className="text-gray-600">Environment configuration and system information</p>
         </div>
-      </div>
 
-      {/* Environment Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Info className="h-5 w-5" />
-            Environment Information
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm font-medium text-gray-600">NODE_ENV</label>
-              <div className="mt-1 p-2 bg-gray-100 rounded font-mono text-sm">
-                {nodeEnv || '(not set)'}
+        {/* Build Information */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-green-500" />
+              Build Information
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <span className="font-medium">Build System:</span>
+                <Badge variant="secondary" className="ml-2">Vite</Badge>
+              </div>
+              <div>
+                <span className="font-medium">Functions Runtime:</span>
+                <Badge variant="secondary" className="ml-2">nodejs20.x</Badge>
+              </div>
+              <div>
+                <span className="font-medium">Mode:</span>
+                <Badge variant={buildInfo.dev ? "destructive" : "default"} className="ml-2">
+                  {buildInfo.mode}
+                </Badge>
+              </div>
+              <div>
+                <span className="font-medium">Base URL:</span>
+                <code className="ml-2 text-sm bg-gray-100 px-2 py-1 rounded">{buildInfo.base}</code>
               </div>
             </div>
-            <div>
-              <label className="text-sm font-medium text-gray-600">MODE</label>
-              <div className="mt-1 p-2 bg-gray-100 rounded font-mono text-sm">
-                {mode || '(not set)'}
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      {/* Vite Environment Variables */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Info className="h-5 w-5" />
-            Vite Environment Variables
-            <Badge variant="outline">{envVars.length} variables</Badge>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {envVars.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                No VITE_* environment variables found
-              </div>
-            ) : (
-              envVars.map((env, index) => (
-                <div key={env.key} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div className="flex-1">
-                    <div className="font-medium text-gray-900">{env.key}</div>
-                    <div className="text-sm text-gray-600 font-mono">
-                      {env.masked ? maskValue(env.value) : env.value || '(empty)'}
+        {/* VITE_ Environment Variables */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-blue-500" />
+              VITE_ Environment Variables
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {viteEnvVars.length > 0 ? (
+              <div className="space-y-3">
+                {viteEnvVars.map(({ key, value, masked }) => (
+                  <div key={key} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div className="flex-1">
+                      <code className="font-mono text-sm font-medium text-blue-600">{key}</code>
+                      <div className="text-sm text-gray-600 mt-1">
+                        {value ? (
+                          <span className="text-green-600">✓ Set</span>
+                        ) : (
+                          <span className="text-red-600">✗ Not set</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <code className="font-mono text-sm text-gray-500">{masked}</code>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => toggleValueVisibility(index)}
-                    >
-                      {env.masked ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => copyToClipboard(env.value, `env-${index}`)}
-                    >
-                      {copied === `env-${index}` ? <CheckCircle className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                    </Button>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <AlertCircle className="h-8 w-8 mx-auto mb-2 text-yellow-500" />
+                <p>No VITE_ environment variables found</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Server Environment Variables */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <XCircle className="h-5 w-5 text-orange-500" />
+              Server Environment Variables
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {serverEnvVars.map(({ key, value, masked }) => (
+                <div key={key} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex-1">
+                    <code className="font-mono text-sm font-medium text-orange-600">{key}</code>
+                    <div className="text-sm text-gray-600 mt-1">
+                      {value ? (
+                        <span className="text-green-600">✓ Available</span>
+                      ) : (
+                        <span className="text-red-600">✗ Not available (server-side only)</span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <code className="font-mono text-sm text-gray-500">{masked}</code>
                   </div>
                 </div>
-              ))
-            )}
-          </div>
-        </CardContent>
-      </Card>
+              ))}
+            </div>
+            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p className="text-sm text-yellow-800">
+                <strong>Note:</strong> Server environment variables are not accessible in the browser. 
+                They are only available in Vercel functions and build processes.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
 
-      {/* Firebase Configuration */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Info className="h-5 w-5" />
-            Firebase Configuration
-            {firebaseConfig?.projectId ? (
-              <Badge variant="outline" className="text-green-600">
-                <CheckCircle className="h-3 w-3 mr-1" />
-                Configured
-              </Badge>
-            ) : (
-              <Badge variant="outline" className="text-red-600">
-                <AlertCircle className="h-3 w-3 mr-1" />
-                Not Configured
-              </Badge>
-            )}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm font-medium text-gray-600">API Key</label>
-              <div className="mt-1 p-2 bg-gray-100 rounded font-mono text-sm">
-                {firebaseConfig?.apiKey ? maskValue(firebaseConfig.apiKey) : '(not set)'}
-              </div>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-600">Auth Domain</label>
-              <div className="mt-1 p-2 bg-gray-100 rounded font-mono text-sm">
-                {firebaseConfig?.authDomain || '(not set)'}
-              </div>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-600">Project ID</label>
-              <div className="mt-1 p-2 bg-gray-100 rounded font-mono text-sm">
-                {firebaseConfig?.projectId || '(not set)'}
-              </div>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-600">Storage Bucket</label>
-              <div className="mt-1 p-2 bg-gray-100 rounded font-mono text-sm">
-                {firebaseConfig?.storageBucket || '(not set)'}
-              </div>
-              {firebaseConfig?.storageBucket && (
-                <div className="mt-1 text-xs text-gray-500">
-                  {firebaseConfig.storageBucket.endsWith('.firebasestorage.app') ? (
-                    <span className="text-green-600">✓ Correct format (new projects)</span>
-                  ) : firebaseConfig.storageBucket.endsWith('.appspot.com') ? (
-                    <span className="text-blue-600">✓ Legacy format (older projects)</span>
-                  ) : firebaseConfig.storageBucket.endsWith('.app') ? (
-                    <span className="text-red-600">⚠ Should be .firebasestorage.app for new projects</span>
-                  ) : (
-                    <span className="text-gray-500">Unknown format</span>
-                  )}
-                </div>
-              )}
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-600">Messaging Sender ID</label>
-              <div className="mt-1 p-2 bg-gray-100 rounded font-mono text-sm">
-                {firebaseConfig?.messagingSenderId || '(not set)'}
-              </div>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-600">App ID</label>
-              <div className="mt-1 p-2 bg-gray-100 rounded font-mono text-sm">
-                {firebaseConfig?.appId || '(not set)'}
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Browser Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Info className="h-5 w-5" />
-            Browser Information
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm font-medium text-gray-600">User Agent</label>
-              <div className="mt-1 p-2 bg-gray-100 rounded font-mono text-xs break-all">
-                {navigator.userAgent}
-              </div>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-600">Platform</label>
-              <div className="mt-1 p-2 bg-gray-100 rounded font-mono text-sm">
-                {navigator.platform}
-              </div>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-600">Language</label>
-              <div className="mt-1 p-2 bg-gray-100 rounded font-mono text-sm">
-                {navigator.language}
-              </div>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-600">Online Status</label>
-              <div className="mt-1 p-2 bg-gray-100 rounded font-mono text-sm">
-                {navigator.onLine ? 'Online' : 'Offline'}
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* URL Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Info className="h-5 w-5" />
-            URL Information
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium text-gray-600">Current URL</label>
-              <div className="mt-1 p-2 bg-gray-100 rounded font-mono text-sm break-all">
-                {window.location.href}
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Browser Information */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-purple-500" />
+              Browser Information
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium text-gray-600">Origin</label>
-                <div className="mt-1 p-2 bg-gray-100 rounded font-mono text-sm">
-                  {window.location.origin}
-                </div>
+                <span className="font-medium">Platform:</span>
+                <code className="ml-2 text-sm">{browserInfo.platform}</code>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-600">Pathname</label>
-                <div className="mt-1 p-2 bg-gray-100 rounded font-mono text-sm">
-                  {window.location.pathname}
-                </div>
+                <span className="font-medium">Language:</span>
+                <code className="ml-2 text-sm">{browserInfo.language}</code>
+              </div>
+              <div>
+                <span className="font-medium">Online:</span>
+                <Badge variant={browserInfo.online ? "default" : "destructive"} className="ml-2">
+                  {browserInfo.online ? 'Yes' : 'No'}
+                </Badge>
+              </div>
+              <div>
+                <span className="font-medium">Cookies:</span>
+                <Badge variant={browserInfo.cookieEnabled ? "default" : "destructive"} className="ml-2">
+                  {browserInfo.cookieEnabled ? 'Enabled' : 'Disabled'}
+                </Badge>
               </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+            <div className="mt-4">
+              <span className="font-medium">User Agent:</span>
+              <code className="block text-xs bg-gray-100 p-2 rounded mt-1 break-all">
+                {browserInfo.userAgent}
+              </code>
+            </div>
+          </CardContent>
+        </Card>
 
-      {copied && (
-        <div className="fixed bottom-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2">
-          <CheckCircle className="h-4 w-4" />
-          Copied to clipboard!
-        </div>
-      )}
+        {/* Actions */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Diagnostic Report</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-gray-600 mb-4">
+              Generate a complete diagnostic report that can be shared for troubleshooting.
+            </p>
+            <Button onClick={copyReport} className="flex items-center gap-2">
+              <Copy className="h-4 w-4" />
+              Copy Diagnostic Report
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
-};
+}
 
-export default DiagnosticPage;
+// Helper function to mask sensitive values
+function maskValue(value: string | undefined): string {
+  if (!value) return 'Not set';
+  if (value.length <= 4) return '***';
+  return value.substring(0, 4) + '***' + value.substring(value.length - 4);
+}

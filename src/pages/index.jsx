@@ -31,7 +31,7 @@ const DiagnosticWrapper = () => {
   React.useEffect(() => {
     // Only import in development
     if (import.meta.env.NODE_ENV !== 'production') {
-      import("./diag").then(module => {
+      import("./diag.tsx").then(module => {
         setDiagnosticPage(() => module.default);
       }).catch(() => {
         // If import fails, show error

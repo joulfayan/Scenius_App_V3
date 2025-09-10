@@ -11,8 +11,10 @@ import {
   PanelLeftClose,
   Search,
   Bell,
-  User
+  User,
+  Bug
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -175,6 +177,13 @@ export default function TopBar({
           <Button variant="ghost" size="sm" className="p-2 hover:bg-gray-100">
             <Bell className="w-4 h-4 text-gray-600" />
           </Button>
+
+          {/* Temporary Diagnostic Link */}
+          <Link to="/diag">
+            <Button variant="ghost" size="sm" className="p-2 hover:bg-gray-100" title="Diagnostic Page">
+              <Bug className="w-4 h-4 text-gray-600" />
+            </Button>
+          </Link>
 
           {/* User Menu */}
           <DropdownMenu>
